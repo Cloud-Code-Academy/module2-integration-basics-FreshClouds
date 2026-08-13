@@ -36,16 +36,19 @@ public with sharing class DummyJSONCallout {
 
 	public static void getDummyJSONUserFromId(String dummyUserId) {
 		// Create HTTP request to send.
-
+		HttpRequest req = new HttpRequest();
 		// Set the endpoint URL. Use direct URL or for best practices use Named Credential.
-
+		req.setEndpoint('callout:DummyJsonUser' + dummyUserId);
 		// Set the HTTP method to GET.
-
+		req.setMethod('GET');
 		// Send the HTTP request and get the response.
-
+		HttpResponse res = new Http().send(req);
 		// If the HTTP response code is successful, parse the JSON response and update the contact.
-		Contact cont = null;
-		upsert cont DummyJSON_Id__c; //insert/update from the JSON response using the external id (dummyUserId)
+		Contact con = null;
+		if (res != null && res.getStatusCode() == 200) {
+			con = createContactFromJson(res.getBody());
+		}
+		upsert as user con DummyJSON_Id__c; //insert/update from the JSON response using the external id (dummyUserId)
 	}
 
 	/* 
@@ -66,16 +69,29 @@ public with sharing class DummyJSONCallout {
 	@TestVisible // Allows test class to see this method. Since it is private, it would not be visible otherwise.
 	private static Contact createContactFromJson(String jsonResponse) {
 		// Deserialize the JSON string into map of primitive data types.
-
+		Map<String, Object> jsonUserMap = (Map<String, Object>) JSON.deserializeUntyped(jsonResponse);
+		Map<String, Object> jsonUserAddress = (Map<String, Object>)jsonUserMap.get('address');
 		// Create a new contact from the JSON response.
-
+		Contact con = new Contact(
+			FirstName = (String)jsonUserMap.get('firstName'),
+			LastName = (String)jsonUserMap.get('lastName'),
+			Email = (String)jsonUserMap.get('email'),
+			GenderIdentity = (String)jsonUserMap.get('gender'),
+			DummyJSON_Id__c = String.valueOf(jsonUserMap.get('id')),
+			Phone = (String)jsonUserMap.get('phone'),
+			Birthdate = (Date)jsonUserMap.get('birthDate'),
+			MailingStreet = (String)jsonUserAddress.get('address'),
+			MailingCity = (String)jsonUserAddress.get('city'),
+			MailingState = (String)jsonUserAddress.get('state'),
+			MailingPostalCode = (String)jsonUserAddress.get('postalCode')
+		);
 		// Set the contact fields from the JSON response.
 
 		// Deserialize the address from the JSON response.
 
 		// Set the address fields on the contact.
 
-		return null;
+		return con;
 	}
 
 	/* 

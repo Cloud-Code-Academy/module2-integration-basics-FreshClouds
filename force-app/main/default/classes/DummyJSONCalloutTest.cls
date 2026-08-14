@@ -89,6 +89,7 @@ public with sharing class DummyJSONCalloutTest {
 	@isTest
 	static void testGenerateDummyJsonUserPayload() {
 		// Prepare test data
+		Test.setMock(HttpCalloutMock.class, new DummyJSONCalloutMockGenerator());
 		Contact testContact = new Contact(
 			FirstName = 'John',
 			LastName = 'Doe',
@@ -97,10 +98,8 @@ public with sharing class DummyJSONCalloutTest {
 			DummyJSON_Id__c = '101'
 		);
 		insert testContact;
-
 		// Call the method
 		String payload = DummyJSONCallout.generateDummyJsonUserPayload(testContact.Id);
-
 		// Parse the generated JSON
 		Map<String, Object> payloadMap = (Map<String, Object>) JSON.deserializeUntyped(payload);
 

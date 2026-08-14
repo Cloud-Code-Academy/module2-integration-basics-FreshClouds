@@ -26,7 +26,44 @@
 	//When a contact is updated
 	// if DummyJSON_Id__c is greater than 100, call the postCreateDummyJSONUser API
 public with sharing class ContactTriggerHandler {
-    public static void Run(TriggerOperation operation, List<Contact> newList, Map<Id, Contact> oldMap) {
-
+    public static void Run(TriggerOperation operation, List<Contact> triggerDotNew, Map<Id, Contact> triggerDotOldMap) {
+		try {
+            switch on operation {
+                when BEFORE_INSERT{
+					setIntialDummyJSONId(triggerDotNew);
+                }
+                when AFTER_INSERT {
+					processSyncDummyJSON(triggerDotNew);
+                }
+				when AFTER_UPDATE {
+					processNewDummyJSONUserId(triggerDotNew);
+				}
+            }
+        } catch (Exception e) {
+            System.debug(e);
+            throw e;
+        }
     }
+	private static void setIntialDummyJSONId(List<Contact> cons) {
+		for(Contact c: cons) {
+			System.debug(c.DummyJson_Id__c);
+			c.DummyJson_Id__c = (String.isBlank(c.DummyJSON_Id__c)) ? generateRandomDummyJsonId() : c.DummyJSON_Id__c;
+		}
+	}
+	private static void processSyncDummyJSON(List<Contact> cons) {
+		List<Id> contactIds = new List<Id>();
+		for(Contact c: cons) {
+			contactIds.add(c.Id);
+		}
+		DummyJSONCallout_Queuable.enqueueDummyJSONCallout(contactIds);
+	}
+	private static void processNewDummyJSONUserId(List<Contact> cons){
+		processSyncDummyJSON(cons);
+	}
+	private static String generateRandomDummyJsonId() {
+		Integer min = 31;
+		//Give space for the native API already existing numbers else duplication and overwrites will occur there are 30 existing users per https://dummyjson.com/users they are immutable and non removable.
+		Integer max = 100;
+		return String.valueOf((Integer)(Math.random() * (max - min + 1)) + min);
+	}
 }

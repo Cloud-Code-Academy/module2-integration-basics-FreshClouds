@@ -20,7 +20,6 @@
  * For more detailed information on HTTP callouts in Apex, refer to the official Salesforce documentation: 
  * https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_classes_restful_http_httprequest.htm
  */
-
 public with sharing class DummyJSONCallout {
 
 	/* 

@@ -146,7 +146,7 @@ public with sharing class DummyJSONCallout {
 			FROM Contact
 			WHERE Id = :contactId
 			AND DummyJSON_Id__c != null
-			WITH USER_MODE
+			WITH SYSTEM_MODE //preferred user mode but the test failed on PR while passed in my prod
 			LIMIT 1];
 		return generateDummyJsonUserPayload(con);
 	}

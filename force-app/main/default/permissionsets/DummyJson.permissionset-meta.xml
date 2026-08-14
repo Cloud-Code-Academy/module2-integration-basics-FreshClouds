@@ -12,6 +12,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Contact.DummyJSON_Last_Updated__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Contact.GenderIdentity</field>
         <readable>true</readable>
     </fieldPermissions>

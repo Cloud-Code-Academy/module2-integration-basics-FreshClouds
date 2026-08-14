@@ -147,6 +147,7 @@ public with sharing class DummyJSONCallout {
 			WHERE Id = :contactId
 			AND DummyJSON_Id__c != null
 			WITH SYSTEM_MODE //preferred user mode but the test failed on PR while passed in my prod
+			//Assumed problem is that the permission set is not being assighned to the user in the auto test
 			LIMIT 1];
 		return generateDummyJsonUserPayload(con);
 	}
